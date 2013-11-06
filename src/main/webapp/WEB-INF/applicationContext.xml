@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jetm="http://jetm.void.fm/schema/jetm_spring_config_1_2"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://jetm.void.fm/schema/jetm_spring_config_1_2 http://jetm.void.fm/schema/jetm_spring_config_1_2.xsd
+		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd		
+		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+	<jetm:runtime />
+
+    <!-- Load CXF modules from cxf.jar -->
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	
+	<!-- *********************** -->
+	<!--  Property Configuration -->
+	<!-- *********************** -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    	<property name="ignoreUnresolvablePlaceholders" value="true"/>
+	</bean>
+	<bean class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer">
+	    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+	    <property name="searchContextAttributes" value="true"/>
+	    <property name="contextOverride" value="true"/>
+	    <property name="ignoreResourceNotFound" value="true"/>
+	    <property name="locations">
+			<list>
+				<value>classpath:config.properties</value>
+				<value>file:///${config_file_path}/example-service/config.properties</value>
+				<value>file:///${APPS_HOME}/example-service/conf/config.properties</value>
+			</list>
+	    </property>
+	</bean>
+
+	<!-- Persistence Beans  -->
+	<bean id="crmDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	    <property name="driverClassName" value="${crm.jdbc.driver}" />
+	    <property name="url" value="${crm.jdbc.url}" />
+	    <property name="username" value="${crm.jdbc.username}" />
+	    <property name="password" value="${crm.jdbc.password}" />
+	    <property name="maxActive" value="${crm.connection.maxactive}" />
+	    <property name="maxIdle" value="${crm.connection.maxidle}" />
+	    <property name="maxWait" value="${crm.connection.maxwait}" />
+	    <property name="minEvictableIdleTimeMillis" value="${crm.connection.minevictableidletimemillis}" />
+	    <property name="timeBetweenEvictionRunsMillis" value="${crm.connection.timeBetweenEvictionRunsMillis}" />
+	    <property name="validationQuery" value="${crm.connection.validationQuery}" />
+	    <property name="testOnBorrow" value="${crm.connection.testOnBorrow}" />
+	    <property name="testOnReturn" value="${crm.connection.testOnReturn}" />
+	    <property name="testWhileIdle" value="${crm.connection.testWhileIdle}" />
+  	</bean>
+
+
+
+	<bean id="entityManagerFactory"
+        class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="ExampleUnit" />
+        <property name="dataSource" ref="crmDataSource" />
+        <property name="jpaVendorAdapter">
+            <bean
+                class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="database" value="${crm.jdbc.database}" />
+                <property name="showSql" value="${crm.hibernate.show_sql}" />
+            </bean>
+        </property>
+
+        <property name="jpaPropertyMap">
+        	<map>
+        		<entry key="hibernate.dialect"
+        			value="${crm.hibernate.dialect}" />
+	       		<entry key="hibernate.cache.region.factory_class"
+	       			value="${crm.hibernate.cache.region.factory_class}" />
+        		<entry key="hibernate.cache.use_second_level_cache"
+        			value="${crm.hibernate.cache.use_second_level_cache}" />
+        		<entry key="hibernate.cache.use_structured_entries"
+        			value="${crm.hibernate.cache.use_structured_entries}" />
+        		<entry key="hibernate.generate_statistics"
+        			value="${crm.hibernate.generate_statistics}" />
+<!-- COMMENT THIS OUT LATER -->        			
+        		<entry key="hibernate.hbm2ddl.auto"
+        			value="${crm.hibernate.hbm2ddl.auto}" />
+        		<entry key="hibernate.jdbc.batch_size"
+        			value="${crm.hibernate.jdbc.batch_size}" />
+        		<entry key="hibernate.format_sql"
+        			value="${crm.hibernate.format_sql}" />
+        		<entry key="hibernate.cache.use_query_cache"
+        			value="${crm.hibernate.cache.use_query_cache}" />
+        	</map>
+        </property>
+    </bean>
+
+
+	<!-- Transaction Manager for Entity Manager -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+		<property name="dataSource" ref="crmDataSource" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- Cache Manager Configuration -->
+	<bean id="cacheManager"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation">
+			<value>classpath:ehcache.xml</value>
+		</property>
+		<property name="shared" value="true" />
+	</bean>
+
+	<!-- *********************** -->
+	<!-- DAOs -->
+	<!-- *********************** -->
+	<bean id="memberDao"
+		class="com.ticketmaster.example.dao.hibernate.MemberHibernateDao">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+		<property name="queryCacheEnabled" value="true"/>
+	</bean>
+
+
+	<!-- *********************** -->
+	<!-- Persistence Services -->
+	<!-- *********************** -->
+	<bean id="memberPersistenceService"
+	  class="com.ticketmaster.example.persistence.service.hibernate.ExampleMemberPersistenceServiceHibernateImpl">
+	  <property name="memberDao" ref="memberDao" />
+	</bean>
+
+
+	<!-- Dozer Bean Mapper Bean -->
+	<bean id="dozerBeanMapper" class="org.dozer.DozerBeanMapper">
+	<!-- 
+		<property name="mappingFiles">
+			<list>
+				<value>dozer-mapping.xml</value>
+			</list>
+		</property>
+	 -->
+	</bean>
+
+	<!-- *********************** -->
+	<!-- Web Services -->
+	<!-- *********************** -->
+	<bean id="memberRestService" class="com.ticketmaster.example.web.service.impl.ExampleMemberRestServiceImpl">
+		<property name="exampleMemberPersistenceService" ref="memberPersistenceService" />
+		<property name="dozerBeanMapper" ref="dozerBeanMapper" />
+	</bean>
+
+	<!-- REST - JAX-RS -->		
+	<bean id="genericExceptionMapper" class="com.ticketmaster.example.rest.exceptionmapper.GenericExceptionMapper">
+		<constructor-arg name="outputMediaType">
+			<value>application/json</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- REST - JAX-RS -->
+	<jaxrs:server id="rsmemberService" address="${example.service.rest.path}">
+		<jaxrs:serviceBeans>
+			<ref bean="memberRestService" />
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+			<ref bean="genericExceptionMapper" />
+		</jaxrs:providers>
+		<jaxrs:extensionMappings>
+			<entry key="json" value="application/json" />
+			<entry key="xml" value="application/xml" />
+		</jaxrs:extensionMappings>
+	</jaxrs:server>
+		
+	
+	<!-- JETM Monitoring Beans -->
+	<jetm:monitoring>
+		<jetm:bean-pattern>memberPersistenceService,memberRestService,memberDao</jetm:bean-pattern>
+	</jetm:monitoring>
+	
+	<jetm:console />
+
+</beans>

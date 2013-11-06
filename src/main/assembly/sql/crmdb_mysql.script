@@ -1,0 +1,50 @@
+CREATE SCHEMA IF NOT EXISTS PUBLIC;
+CREATE USER 'SA'  IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON *.* TO 'SA';
+USE PUBLIC;
+
+CREATE TABLE IF NOT EXISTS `tbl_household` (
+    `HouseHoldID` INTEGER NOT NULL AUTO_INCREMENT,
+    `Address1` varchar(80) NULL,
+    `Address2` varchar(80) NULL,
+    `City` varchar(40) NULL,
+    `State` varchar(20) NULL,
+    `Zip` varchar(20) NULL,
+    `NCOA_Recency` TIMESTAMP NULL,
+    `Latest_Record_Update` TIMESTAMP NOT NULL,
+    `Date_Record_Added` TIMESTAMP NOT NULL,
+    `persistence_version` INTEGER NULL,
+    PRIMARY KEY  (`HouseHoldID`)) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `tbl_purchaser` (
+    `PurchaserID` INTEGER NOT NULL AUTO_INCREMENT,
+    `HouseHoldID` INTEGER,
+    `FirstName` varchar(40) NOT NULL,
+    `Initial` varchar(10) NULL,
+    `LastName` varchar(40) NOT NULL,
+    `Prefix` varchar(20) NULL,
+    `Suffix` varchar(20) NULL,
+    `Phone1` char(13) NULL,
+    `Phone2` char(13) NULL,
+    `Email` varchar(70) NULL,
+    `EmailSource` varchar(10) NULL,
+    `EmailPrefSource` varchar(30) NULL,
+    `NoEmailFlag` BOOLEAN NOT NULL,
+    `Latest_Record_Update` TIMESTAMP NOT NULL,
+    `Date_Record_Added` TIMESTAMP NOT NULL,
+    `persistence_version` INTEGER NULL,
+     PRIMARY KEY  (`PurchaserID`),
+     CONSTRAINT `fk_household_id`
+    FOREIGN KEY (`HouseHoldID` ) references `tbl_household` (`HouseHoldID`)  )ENGINE=INNODB;
+
+INSERT INTO tbl_household VALUES (1,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1);
+INSERT INTO tbl_purchaser VALUES (1,1,'Peter',NULL,'Parker','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1);
+
+INSERT INTO tbl_household VALUES (2,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1);
+INSERT INTO tbl_purchaser VALUES (2,2,'Bruce',NULL,'Wayne','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1);
+
+INSERT INTO tbl_household VALUES (3,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1);
+INSERT INTO tbl_purchaser VALUES (3,3,'Clark',NULL,'Kent','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1);
+
+INSERT INTO tbl_household VALUES (4,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1);
+INSERT INTO tbl_purchaser VALUES (4,4,'Tony',NULL,'Stark','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1);

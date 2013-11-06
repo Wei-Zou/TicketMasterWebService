@@ -1,0 +1,46 @@
+CREATE SCHEMA PUBLIC AUTHORIZATION DBA
+
+CREATE USER SA PASSWORD ""
+
+GRANT DBA TO SA
+
+SET WRITE_DELAY 10
+
+SET SCHEMA PUBLIC
+
+CREATE MEMORY TABLE tbl_household (HouseHoldID int identity, Address1 varchar(80) NULL, Address2 varchar(80) NULL, City varchar(40) NULL, State varchar(20) NULL, Zip varchar(20) NULL, PurchaserID int NULL, NCOA_Recency TIMESTAMP NULL, Latest_Record_Update TIMESTAMP NOT NULL, Date_Record_Added TIMESTAMP NOT NULL, persistence_version int NULL  )
+CREATE MEMORY TABLE tbl_purchaser (PurchaserID int identity, HouseHoldID int, FirstName varchar(40) NOT NULL, Initial varchar(10) NULL, LastName varchar(40) NOT NULL, Prefix varchar(20) NULL, Suffix varchar(20) NULL, Phone1 char(13) NULL, Phone2 char(13) NULL, Email varchar(70) NULL, EmailSource varchar(10) NULL, EmailPrefSource varchar(30) NULL, NoEmailFlag bit NOT NULL, Latest_Record_Update TIMESTAMP NOT NULL, Date_Record_Added TIMESTAMP NOT NULL, persistence_version int NULL, FOREIGN KEY (HouseHoldID ) references tbl_household(HouseHoldID)  )
+CREATE MEMORY TABLE tbl_zip_code (ZipCodeID int identity, City varchar(40) NULL, State varchar(20) NULL, Zip varchar(20) NOT NULL, NCOA_Recency TIMESTAMP NULL, Latest_Record_Update TIMESTAMP NOT NULL, Date_Record_Added TIMESTAMP NOT NULL, persistence_version int NULL  )
+
+INSERT INTO tbl_household VALUES (1,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 1, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (1,1,'Peter',NULL,'Parker','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (2,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 2, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (2,2,'Bruce',NULL,'Wayne','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (3,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 3, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (3,3,'Clark',NULL,'Kent','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (4,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 4, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (4,4,'Tony',NULL,'Stark','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (5,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 5, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (5,5,'Peter',NULL,'Parker','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (6,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 6, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (6,6,'Bruce',NULL,'Wayne','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (7,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 7, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (7,7,'Clark',NULL,'Kent','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (8,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 8, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (8,8,'Tony',NULL,'Stark','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (10,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 10, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (10,10,'Bill',NULL,'Gates','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (11,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 11, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (11,11,'Larry',NULL,'Elison','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+
+INSERT INTO tbl_household VALUES (12,'222 Oceano Drive', NULL, 'El Segundo', 'CA', '90245', 12, NULL, '2010-10-20 09:24:00','2010-10-20 09:24:00',1)
+INSERT INTO tbl_purchaser VALUES (12,12,'Stephen',NULL,'Jooob','Mr',NULL,NULL,NULL,NULL,NULL,NULL,0,'2010-10-20 09:24:00','2010-10-20 09:24:00',1)

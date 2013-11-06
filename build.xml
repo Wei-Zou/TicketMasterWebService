@@ -1,0 +1,131 @@
+<project name="example-service" default="deploy" basedir=".">
+	<description>
+		simple example build file.
+		build file is responsible for 'installing' (copying) the project files.
+		Deploy target types: 
+		      "deploy" - Deploys artifacts. 
+				
+				Performs following tasks
+					1) cleans out OLD deployed webapp from tomcat webapps folder
+					2) copy NEW WAR to tomcat webapps folder
+					3) copy config files to config folder
+					4) copy init scripts to init folder
+
+    </description>
+
+	<!-- set global properties for this build -->
+	<property environment="env."/>
+
+	<!-- set local variables to use as holders of environmental variable values -->
+	<property name="home"						value="."/>
+	<property name="java.home"					value="${env.JAVA_HOME}" />
+	<property name="tomcat.home"				value="${env.TOMCAT_HOME}" />
+	<property name="apps.home"					value="${env.APPS_HOME}" />
+
+	<property name="app.name"					value="${ant.project.name}" />
+	<property name="tomcat.conf.dir"			value="${tomcat.home}/conf"/>
+	<property name="tomcat.webapps.dir"			value="${tomcat.home}/webapps"/>
+	<property name="tomcat.webapp.home"			value="${tomcat.webapps.dir}/${app.name}"/>
+	
+	<property name="deploy.config.file.location"	value="${apps.home}/${app.name}/conf" />	
+	<property name="deploy.init.file.location"	value="${apps.home}/${app.name}/init" />
+
+	<!-- This variable sets the deployment environment.  The server AWS instance is considered "dev".  This ties any configuration 
+	files under /src/main/assembly/conf such that a given sub directly implies its value.  Any configuration files under that
+	will then be deployed respectively.  It also acts as a switch for init script deployment.  The init scripts are stored at /src/main/assembly/bin -->
+	
+	<property name="deploy.environment" value="dev" />
+
+	<!-- Set 'deploy.scripts' to act as a flag indicating whether or not scripts should be deployed.  This should
+	only be done if the 'deploy.environment' is set to 'dev'.  'local' deployments will not deploy the scripts.  -->
+    <target name="deploy-scripts-check">
+    	<condition property="deploy.scripts" value="true" else="false">
+			<and>
+				<equals arg1="${deploy.environment}" arg2="dev" />
+			</and>
+		</condition>
+    </target>
+	
+	<!-- BEGIN: DEPLOY targets -->
+
+	<!-- **********************-->
+	<!-- This is the main deploy target.  All execution starts here. -->
+	<!-- **********************-->
+	<target name="deploy">
+		<antcall target="tomcat.deploy" />
+	</target>
+
+	<!-- END: DEPLOY targets -->
+
+	<!-- BEGIN: COPY APP AND CONFIG FILES targets -->
+
+	<!-- This is the wrapper target for all sub targets and tasks -->
+	<target name="tomcat.deploy" depends="deploy-scripts-check">
+		<antcall target="copyAppFileFromMaven" />
+		<!-- Making this dir if it doesn't exists -->
+		<mkdir  dir="${deploy.config.file.location}"/>
+		<antcall target="copyConfigFilesFromMaven"/>
+		<!-- Making this dir if it doesn't exists -->
+		<mkdir  dir="${deploy.init.file.location}"/>
+		<antcall target="copyInitScriptsFromMaven"/>
+	</target>
+
+	<!-- END: COPY APP AND CONFIG FILES targets -->
+
+	<!-- BEGIN: COPY INIT Scripts targets -->
+	
+	<target name="copyInitScriptsFromMaven" description="Copy init scripts to init directory.">
+		<echo message="copying init files from: ${maven.project.basedir}/target/${maven.build.finalName}-bin.dir/${maven.build.finalName}/bin">
+		</echo>
+		<echo message=" copying to: ${deploy.init.file.location}"/>
+		<copy todir="${deploy.init.file.location}" overwrite="true">
+			<fileset dir="${maven.project.basedir}/target/${maven.build.finalName}-bin/${maven.build.finalName}/bin" >
+				<include name="*"/>
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<!-- Set permissions of init scripts to execute -->
+		<chmod perm="775" dir="${deploy.init.file.location}" includes="*" />
+	</target>
+	
+	<!-- END: COPY INIT Scripts targets -->
+	
+	<!-- BEGIN: COPY APP targets -->
+
+	<!-- From Maven -->
+	<target name="copyAppFileFromMaven" description="Copy deployable webapp to deployment directory." >
+		<antcall target="cleanTomcatFromMaven" />
+		<copy file="${maven.project.basedir}/target/${maven.build.finalName}.war" todir="${tomcat.webapps.dir}" overwrite="true" />
+	</target>
+
+	<!-- END: COPY APP targets -->
+
+	<!-- BEGIN: COPY APP CONFIG FILES targets -->
+
+	<target name="copyConfigFilesFromMaven" description="Copy config files to webapp">
+		<echo message="copying config files from: ${maven.project.basedir}/target/${maven.build.finalName}-bin.dir/${maven.build.finalName}/conf/${deploy.environment}">
+		</echo>
+		<echo message=" copying to: ${deploy.config.file.location}"/>
+		<copy todir="${deploy.config.file.location}" overwrite="true">
+			<fileset dir="${maven.project.basedir}/target/${maven.build.finalName}-bin/${maven.build.finalName}/conf/${deploy.environment}" >
+				<include name="*"/>
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- END: COPY APP CONFIG FILES targets -->
+
+	<!-- END COMPILE -->
+
+	<!-- From Maven -->
+	<target name="cleanTomcatFromMaven" description="clean up" >
+		<antcall target="cleanWebappFromMaven" />
+		<delete file="${tomcat.webapps.dir}/${maven.build.finalName}.war" failonerror="${cleanup.failonerror}" />
+	</target>
+	<target name="cleanWebappFromMaven" description="delete unpacked deployable files.">
+		<delete dir="${tomcat.webapps.dir}/${maven.build.finalName}" failonerror="${cleanup.failonerror}" />
+	</target>
+	<!-- END CLEAN -->
+
+</project>

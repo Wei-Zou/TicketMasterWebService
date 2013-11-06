@@ -1,0 +1,55 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+  
+  <id>bin</id>
+   
+  <formats>
+  	<format>dir</format>
+    <format>tar.gz</format>    
+  </formats>
+  <includeBaseDirectory>true</includeBaseDirectory>
+
+  <fileSets>
+
+    <fileSet>
+      <directory>${project.build.directory}</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+  
+        <include>*.war</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>/bin</outputDirectory>
+      <directory>src/main/assembly/bin</directory>
+      <directoryMode>0755</directoryMode>
+      <lineEnding>unix</lineEnding>
+      <filtered>false</filtered>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>/bin</outputDirectory>
+      <includes>
+      	<include>
+      		build.xml
+      	</include>
+      </includes>
+      <filtered>false</filtered>
+    </fileSet>            
+    <fileSet>    
+      <outputDirectory>/etc</outputDirectory>
+      <directory>src/main/assembly/etc</directory>
+      <filtered>false</filtered>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>/conf</outputDirectory>
+      <directory>src/main/assembly/conf</directory>
+      <lineEnding>unix</lineEnding>
+      <filtered>false</filtered>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>sql</outputDirectory>
+      <directory>src/main/assembly/sql</directory>            
+    </fileSet>    
+  </fileSets>
+</assembly>
