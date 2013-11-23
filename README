@@ -1,0 +1,27 @@
+TicketMasterWebService
+======================
+
+Webservice for TicketMaster resale project
+
+In linux/unix runs build and deploys on server
+    $ sudo mvn clean integration-test -Dmaven.tomcat.deploy=true -Ddeploy.environment=dev
+
+In linux/unix runs build and deploys using LOCAL configuration as is defined in the package structure: /src/main/assembly/conf/local
+    $ sudo mvn clean integration-test -Dmaven.tomcat.deploy=true -Ddeploy.environment=local
+
+Cleans out a prior build
+    $ mvn clean
+
+Builds the package
+    $ mvn package
+    $ mvn clean package
+
+Runs the unit tests
+    $ mvn test
+    $ mvn clean test
+
+Tomcat Start/Stop
+> You can use the init scripts to start/stop tomcat.  They are available at: /usr/app/example-service/init on the server
+> They are just for linux/unix but the windows scripts would be similar only with a change of the executable file to catalina.bat
+
+* Remember that there is a deploy script at ~/working/example-service-ucla/deploy.sh
